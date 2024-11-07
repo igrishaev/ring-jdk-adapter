@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Map;
 import java.net.URI;
 
-public class RingHandler implements HttpHandler {
+public class Handler implements HttpHandler {
 
     private final IFn ringHandler;
 
-    public RingHandler(final IFn ringHandler) {
+    public Handler(final IFn ringHandler) {
         this.ringHandler = ringHandler;
     }
 

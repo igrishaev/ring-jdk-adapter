@@ -17,7 +17,7 @@ public class Server implements AutoCloseable {
 
     private Server(final String host, final int port, final IFn clojureHandler) {
         this.address = new InetSocketAddress(host, port);
-        this.javaHandler = new RingHandler(clojureHandler);
+        this.javaHandler = new Handler(clojureHandler);
     }
 
     @SuppressWarnings("unused")

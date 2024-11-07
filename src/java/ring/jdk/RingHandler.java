@@ -24,7 +24,7 @@ public class RingHandler implements HttpHandler {
         IPersistentMap result = PersistentHashMap.EMPTY;
         for (Map.Entry<String, List<String>> me: headers.entrySet()) {
             if (me.getValue().size() == 1) {
-                result = result.assoc(me.getKey(), me.getValue().getFirst());
+                result = result.assoc(me.getKey(), me.getValue().get(0));
             } else {
                 result = result.assoc(me.getKey(), PersistentVector.create(me.getValue()));
             }
@@ -96,27 +96,32 @@ public class RingHandler implements HttpHandler {
         if (bodyObj == null) {
             sendStatus(exchange, status, 0);
             sendHeaders(ringHeaders, javaHeaders);
+            IO.close(out);
 
         } else if (bodyObj instanceof InputStream in) {
             sendStatus(exchange, status, 0);
             sendHeaders(ringHeaders, javaHeaders);
             IO.transfer(in, out);
+            IO.close(out);
 
         } else if (bodyObj instanceof File file) {
             sendStatus(exchange, status, file.length());
             sendHeaders(ringHeaders, javaHeaders);
             IO.transfer(IO.toInputStream(file), out);
+            IO.close(out);
 
         } else if (bodyObj instanceof String s) {
             final byte[] ba = s.getBytes(StandardCharsets.UTF_8);
             sendStatus(exchange, status, ba.length);
             sendHeaders(ringHeaders, javaHeaders);
             IO.transfer(new ByteArrayInputStream(ba), out);
+            IO.close(out);
 
         } else if (bodyObj instanceof byte[] ba) {
             sendStatus(exchange, status, ba.length);
             sendHeaders(ringHeaders, javaHeaders);
             IO.transfer(new ByteArrayInputStream(ba), out);
+            IO.close(out);
 
         } else if (bodyObj instanceof Iterable<?> iterable) {
             sendStatus(exchange, status, 0);
@@ -128,8 +133,11 @@ public class RingHandler implements HttpHandler {
                     throw Err.error("item %s is not a string:", item);
                 }
             }
+            IO.close(out);
+
         } else {
-            throw Err.error("response body is unsupported: %s", bodyObj);
+            IO.close(out);
+            throw Err.error("ring body is unsupported: %s", bodyObj);
         }
     }
 

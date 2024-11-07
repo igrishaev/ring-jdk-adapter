@@ -34,4 +34,12 @@ public class IO {
             throw Err.error(e, "could not write string to the output stream");
         }
     }
+
+    public static void close(final OutputStream out) {
+        try {
+            out.close();
+        } catch (IOException e) {
+            throw Err.error(e, "cannot close the output stream");
+        }
+    }
 }

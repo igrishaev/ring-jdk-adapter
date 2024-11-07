@@ -32,6 +32,7 @@ public class Server implements AutoCloseable {
             throw Err.error(e, "failed to create HTTP server, addr: %s", address);
         }
         httpServer.createContext("/", javaHandler);
+        httpServer.setExecutor(null);
         httpServer.start();
         return this;
     }

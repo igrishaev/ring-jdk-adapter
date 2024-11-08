@@ -5,5 +5,6 @@
 - const namespace
 - clojure tests
 - scheme
-- server-name
 - executor (number of threads)
+- ring.adapter.jdk
+- config map -> builder

@@ -1,4 +1,5 @@
 (def MIN_JAVA_VERSION "16")
+(def RING_VERSION "1.13.0")
 
 (defproject ring-jdk-adapter "0.1.0-SNAPSHOT"
 
@@ -35,12 +36,18 @@
   []
 
   :managed-dependencies
-  [[org.clojure/clojure "1.11.1"]]
+  [[org.clojure/clojure "1.11.1"]
+   [ring/ring-core ~RING_VERSION]
+   [ring/ring-jetty-adapter ~RING_VERSION]
+   [clj-http "3.13.0"]]
 
   :profiles
   {:dev
    {:source-paths ["dev"]
-    :dependencies [[org.clojure/clojure]]
+    :dependencies [[org.clojure/clojure]
+                   [ring/ring-core]
+                   [ring/ring-jetty-adapter]
+                   [clj-http]]
     :global-vars
     {*warn-on-reflection* true
      *assert* true}}

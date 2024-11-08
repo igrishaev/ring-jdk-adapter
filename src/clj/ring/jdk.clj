@@ -2,7 +2,7 @@
   (:import
    ring.jdk.Server))
 
-(defn start-server ^Server [host port fn-handler]
+(defn server ^Server [host port fn-handler]
   (Server/start host port fn-handler))
 
 (defmacro with-server [[& args] & body]

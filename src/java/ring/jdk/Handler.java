@@ -39,6 +39,7 @@ public class Handler implements HttpHandler {
         final InetSocketAddress remoteAddress = httpExchange.getRemoteAddress();
         final Headers headers = httpExchange.getRequestHeaders();
         final int serverPort = httpExchange.getHttpContext().getServer().getAddress().getPort();
+        final String serverName = httpExchange.getHttpContext().getServer().getAddress().getHostName();
 
         return PersistentHashMap.create(
                 KW.body, body,
@@ -48,7 +49,7 @@ public class Handler implements HttpHandler {
                 KW.request_method, method,
                 // KW.scheme, "dunno",
                 KW.headers, toClojureHeaders(headers),
-                // KW.server_name, "dunno",
+                KW.server_name, serverName,
                 KW.server_port, serverPort
         );
     }

@@ -13,7 +13,7 @@ public class Server implements AutoCloseable {
     private final HttpHandler javaHandler;
     private final InetSocketAddress address;
 
-    public static int STOP_DELAY_MS = 1000;
+    public static int STOP_DELAY_SEC = 0;
 
     private Server(final String host, final int port, final IFn clojureHandler) {
         this.address = new InetSocketAddress(host, port);
@@ -39,6 +39,6 @@ public class Server implements AutoCloseable {
 
     @Override
     public void close() {
-        httpServer.stop(STOP_DELAY_MS);
+        httpServer.stop(STOP_DELAY_SEC);
     }
 }

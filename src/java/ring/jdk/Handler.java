@@ -7,7 +7,6 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.*;
 import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.net.URI;
@@ -32,29 +31,6 @@ public class Handler implements HttpHandler {
         return result;
     }
 
-    private static void sendHeaders(final Map<?,?> ringHeaders, final Headers javaHeaders) {
-        Object k, v;
-        for (Map.Entry<?,?> me: ringHeaders.entrySet()) {
-            k = me.getKey();
-            v = me.getValue();
-            if (k instanceof String ks) {
-                if (v instanceof String vs) {
-                    javaHeaders.add(ks, vs);
-                } else if (v instanceof Iterable<?> iterable){
-                    for (Object vi: iterable) {
-                        if (vi instanceof String vis) {
-                            javaHeaders.add(ks, vis);
-                        } else {
-                            throw Err.error("unsupported header value: %s", vi);
-                        }
-                    }
-                }
-            } else {
-                throw Err.error("header name is not a string: %s", k);
-            }
-        }
-    }
-
     private Map<?,?> toRequest(final HttpExchange httpExchange) {
         final String protocol = httpExchange.getProtocol();
         final String method = httpExchange.getRequestMethod();
@@ -77,106 +53,52 @@ public class Handler implements HttpHandler {
         );
     }
 
-    private void sendStatus(final HttpExchange exchange, final int status, final long len) {
+    private void sendStatus(final HttpExchange exchange, final int httpStatus, final long contentLength) {
         try {
-            exchange.sendResponseHeaders(status, 0);
+            exchange.sendResponseHeaders(httpStatus, contentLength);
         } catch (IOException e) {
-            throw Err.error(e, "cannot send response headers, status: %s, response length: %s", status, len);
+            throw Err.error(e,
+                    "cannot send response headers, status: %s, response length: %s",
+                    httpStatus, contentLength
+            );
         }
     }
 
-    private void sendResponse(final int status,
-                              final Map<?,?> ringHeaders,
-                              final Object bodyObj,
-                              final HttpExchange exchange) {
-
-        final Headers javaHeaders = exchange.getResponseHeaders();
+    private void sendResponse(final Response response, final HttpExchange exchange) {
+        final Headers headers = exchange.getResponseHeaders();
+        for (Header h: response.headers()) {
+            headers.add(h.k(), h.v());
+        }
+        sendStatus(exchange, response.status(), response.contentLength());
         final OutputStream out = exchange.getResponseBody();
-
-        if (bodyObj == null) {
-            sendStatus(exchange, status, 0);
-            sendHeaders(ringHeaders, javaHeaders);
-            IO.close(out);
-
-        } else if (bodyObj instanceof InputStream in) {
-            sendStatus(exchange, status, 0);
-            sendHeaders(ringHeaders, javaHeaders);
-            IO.transfer(in, out);
-            IO.close(out);
-
-        } else if (bodyObj instanceof File file) {
-            sendStatus(exchange, status, file.length());
-            sendHeaders(ringHeaders, javaHeaders);
-            IO.transfer(IO.toInputStream(file), out);
-            IO.close(out);
-
-        } else if (bodyObj instanceof String s) {
-            final byte[] ba = s.getBytes(StandardCharsets.UTF_8);
-            sendStatus(exchange, status, ba.length);
-            sendHeaders(ringHeaders, javaHeaders);
-            IO.transfer(new ByteArrayInputStream(ba), out);
-            IO.close(out);
-
-        } else if (bodyObj instanceof byte[] ba) {
-            sendStatus(exchange, status, ba.length);
-            sendHeaders(ringHeaders, javaHeaders);
-            IO.transfer(new ByteArrayInputStream(ba), out);
-            IO.close(out);
-
-        } else if (bodyObj instanceof Iterable<?> iterable) {
-            sendStatus(exchange, status, 0);
-            sendHeaders(ringHeaders, javaHeaders);
-            for (Object item: iterable) {
-                if (item instanceof String s) {
-                    IO.write(out, s, StandardCharsets.UTF_8);
-                } else {
-                    throw Err.error("item %s is not a string:", item);
-                }
+        final InputStream bodyStream = response.bodyStream();
+        if (bodyStream != null) {
+            IO.transfer(bodyStream, out);
+        }
+        final Iterable<?> bodyIter = response.bodyIter();
+        if (bodyIter != null) {
+            for (Object x: bodyIter) {
+                IO.transfer(x.toString(), out);
             }
-            IO.close(out);
-
-        } else {
-            IO.close(out);
-            throw Err.error("ring body is unsupported: %s", bodyObj);
         }
-    }
-
-    private int getStatus(final Map<?,?> ringResponse) {
-        final Object x = ringResponse.get(KW.status);
-        if (x instanceof Integer i) {
-            return i;
-        } else {
-            throw Err.error("ring status code is not integer: %s", x);
-        }
-    }
-
-    private Map<?,?> getHeaders(final Map<?,?> ringResponse) {
-        final Object x = ringResponse.get(KW.headers);
-        if (x == null) {
-            return PersistentHashMap.EMPTY;
-        } else if (x instanceof Map<?,?> m) {
-            return m;
-        } else {
-            throw Err.error("unsupported ring headers: %s", x);
-        }
-    }
-
-    private void sendResponse(final Object response, final HttpExchange exchange) {
-        if (response instanceof Map<?,?> clojureResponse) {
-            final int status = getStatus(clojureResponse);
-            final Map<?,?> headers = getHeaders(clojureResponse);
-            final Object body = clojureResponse.get(KW.body);
-            sendResponse(status, headers, body, exchange);
-        } else {
-            throw Err.error("ring response is not a map: %s", response);
-        }
+        IO.close(out);
     }
 
     @Override
     public void handle(HttpExchange exchange) {
         final Map<?,?> request = toRequest(exchange);
-        // try catch
-        final Object response = ringHandler.invoke(request);
-        sendResponse(response, exchange);
+        Object ringResponse;
+        Response javaResponse;
+        try {
+            ringResponse = ringHandler.invoke(request);
+        } catch (Exception e) {
+            ringResponse = Response.get500response(e, "failed to execute the ring handler");
+        }
+        try {
+            javaResponse = Response.fromRingResponse(ringResponse);
+        } catch (Exception e) {
+            javaResponse = Response.get500response(e, "ring response is malformed");
+        }
+        sendResponse(javaResponse, exchange);
     }
 }

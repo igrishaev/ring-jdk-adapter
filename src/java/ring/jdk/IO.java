@@ -10,7 +10,16 @@ public class IO {
         try {
             in.transferTo(out);
         } catch (IOException e) {
-            throw Err.error("could not transfer input stream to output stream");
+            throw Err.error("could not transfer ab input stream into the output stream");
+        }
+    }
+
+    public static void transfer(final String s, final OutputStream out) {
+        final byte[] buf = s.getBytes(StandardCharsets.UTF_8);
+        try {
+            out.write(buf);
+        } catch (IOException e) {
+            throw Err.error("could not transfer a string into the output stream");
         }
     }
 
@@ -42,4 +51,5 @@ public class IO {
             throw Err.error(e, "cannot close the output stream");
         }
     }
+
 }

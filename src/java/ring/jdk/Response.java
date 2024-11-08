@@ -1,8 +1,6 @@
 package ring.jdk;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +17,9 @@ public record Response (
 
     public static Response get500response(final Throwable e, final String message) {
         final List<Header> headers = List.of(new Header("Content-Type", "text/plain"));
-        final String payload = message + "\n" + e.toString();
+        final StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        final String payload = message + "\n" + sw.toString();
         final byte[] buf = payload.getBytes(StandardCharsets.UTF_8);
         return new Response(
                 500,
@@ -96,12 +96,14 @@ public record Response (
                 bodyStream = InputStream.nullInputStream();
             } else if (bodyObj instanceof Iterable<?> i) {
                 bodyIter = i;
+            } else {
+                throw Err.error("unsupported ring body: %s", bodyObj);
             }
 
             return new Response(status, headers, bodyStream, bodyIter, contentLength);
 
         } else {
-            throw Err.error("wrong ring response: %s", x);
+            throw Err.error("unsupported ring response: %s", x);
         }
 
     }

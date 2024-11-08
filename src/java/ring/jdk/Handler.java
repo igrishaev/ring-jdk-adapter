@@ -91,13 +91,9 @@ public class Handler implements HttpHandler {
         Response javaResponse;
         try {
             ringResponse = ringHandler.invoke(request);
-        } catch (Exception e) {
-            ringResponse = Response.get500response(e, "failed to execute the ring handler");
-        }
-        try {
             javaResponse = Response.fromRingResponse(ringResponse);
         } catch (Exception e) {
-            javaResponse = Response.get500response(e, "ring response is malformed");
+            javaResponse = Response.get500response(e, "failed to execute ring handler");
         }
         sendResponse(javaResponse, exchange);
     }

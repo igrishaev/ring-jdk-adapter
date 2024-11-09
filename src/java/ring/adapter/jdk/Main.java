@@ -1,4 +1,4 @@
-package ring.jdk;
+package ring.adapter.jdk;
 
 import clojure.lang.AFn;
 import clojure.lang.PersistentHashMap;

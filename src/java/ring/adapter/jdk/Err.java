@@ -1,4 +1,4 @@
-package ring.jdk;
+package ring.adapter.jdk;
 
 public class Err {
 

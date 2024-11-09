@@ -1,6 +1,6 @@
 (ns ring.jdk
   (:import
-   ring.jdk.Server))
+   ring.adapter.jdk.Server))
 
 (defn server ^Server [host port fn-handler]
   (Server/start host port fn-handler))

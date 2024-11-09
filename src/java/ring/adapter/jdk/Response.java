@@ -1,4 +1,4 @@
-package ring.jdk;
+package ring.adapter.jdk;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

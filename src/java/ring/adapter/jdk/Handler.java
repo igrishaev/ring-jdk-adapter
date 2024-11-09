@@ -31,6 +31,18 @@ public class Handler implements HttpHandler {
         return result;
     }
 
+    private static Keyword toClojureMethod(final String method) {
+        return switch (method) {
+            case "GET" -> KW.get;
+            case "POST" -> KW.post;
+            case "PUT" -> KW.put;
+            case "PATCH" -> KW.patch;
+            case "DELETE" -> KW.delete;
+            case "OPTIONS" -> KW.options;
+            default -> Keyword.intern(method.toLowerCase());
+        };
+    }
+
     private Map<?,?> toRequest(final HttpExchange httpExchange) {
         final String protocol = httpExchange.getProtocol();
         final String method = httpExchange.getRequestMethod();
@@ -47,7 +59,7 @@ public class Handler implements HttpHandler {
                 KW.uri, uri.toString(),
                 KW.protocol, protocol,
                 KW.remote_addr, remoteAddress.toString(),
-                KW.request_method, method,
+                KW.request_method, toClojureMethod(method),
                 KW.query_string, queryString,
                 KW.headers, toClojureHeaders(headers),
                 KW.server_name, serverName,

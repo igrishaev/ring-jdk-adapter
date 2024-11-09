@@ -15,9 +15,12 @@ public class KW {
     public static final Keyword server_port = Keyword.intern("server-port");
     public static final Keyword status = Keyword.intern("status");
     public static final Keyword query_string = Keyword.intern("query-string");
-
-
-
+    public static final Keyword get = Keyword.intern("get");
+    public static final Keyword post = Keyword.intern("post");
+    public static final Keyword put = Keyword.intern("put");
+    public static final Keyword delete = Keyword.intern("delete");
+    public static final Keyword patch = Keyword.intern("patch");
+    public static final Keyword options = Keyword.intern("options");
 }
 
 

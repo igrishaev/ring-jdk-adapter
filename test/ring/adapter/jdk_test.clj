@@ -1,8 +1,8 @@
-(ns ring.jdk-test
+(ns ring.adapter.jdk-test
   (:require
    [clj-http.client :as client]
    [clojure.test :refer [deftest is]]
-   [ring.jdk :as jdk]))
+   [ring.adapter.jdk :as jdk]))
 
 
 (def PORT 8081)
@@ -29,7 +29,7 @@
   RESP_HELLO)
 
 (deftest test-server-ok
-  (jdk/with-server ["127.0.0.1" PORT handler-ok]
+  (jdk/with-server [handler-ok {:port PORT}]
     (let [response
           (client/get URL)]
       (is (= {:status 200
@@ -45,10 +45,10 @@
 
 (deftest test-capture-request
   (let [capture! (atom nil)]
-    (jdk/with-server ["127.0.0.1" PORT
-                      (fn [request]
+    (jdk/with-server [(fn [request]
                         (reset! capture! request)
-                        RESP_HELLO)]
+                        RESP_HELLO)
+                      {:port PORT}]
       (let [_ (client/get URL)
             request @capture!]
         (is (= {:protocol "HTTP/1.1",
@@ -58,6 +58,7 @@
                  "Host" "127.0.0.1:8081"},
                 :server-port 8081,
                 :server-name "localhost"
+                :query-string nil
                 :uri "/",
                 :request-method "GET"}
                (-> request
@@ -75,3 +76,7 @@
 ;; exception in ring
 ;; broken response: status, headers, body
 ;; read body
+;; query-params
+;; form-params
+;; some middleware
+;; toString

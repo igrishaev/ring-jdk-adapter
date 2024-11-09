@@ -1,7 +1,7 @@
 (ns bench
   (:require
    [ring.adapter.jetty :as jetty]
-   [ring.jdk :as jdk]))
+   [ring.adapter.jdk :as jdk]))
 
 (defn handler [request]
   {:status 200
@@ -18,7 +18,7 @@
   (.stop -server-jetty)
 
   (def -server-jdk
-    (jdk/server "127.0.0.1" 8082 handler))
+    (jdk/server handler {:port 8082}))
 
   (.close -server-jdk)
 

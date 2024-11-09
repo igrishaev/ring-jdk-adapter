@@ -19,7 +19,7 @@ public record Response (
         final List<Header> headers = List.of(new Header("Content-Type", "text/plain"));
         final StringWriter sw = new StringWriter();
         e.printStackTrace(new PrintWriter(sw));
-        final String payload = message + "\n" + sw.toString();
+        final String payload = message + "\n" + sw;
         final byte[] buf = payload.getBytes(StandardCharsets.UTF_8);
         return new Response(
                 500,

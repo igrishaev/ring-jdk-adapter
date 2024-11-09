@@ -6,7 +6,7 @@ import clojure.lang.PersistentHashMap;
 public class Main {
 
     public static void main(String... args) {
-        final Server s = Server.start("127.0.0.1", 8080, new AFn() {
+        final Server s = Server.start(new AFn() {
             @Override
             public Object invoke(Object request) {
                 int a = 0 / 1;

@@ -10,22 +10,32 @@ import java.util.concurrent.Executors;
 
 public class Server implements AutoCloseable {
 
-    private HttpServer httpServer;
     private final Config config;
+    private final IFn ringHandler;
+    private HttpServer httpServer;
 
-    private Server(final Config config) {
+    private Server(final IFn ringHandler, final Config config) {
+        this.ringHandler = ringHandler;
         this.config = config;
     }
 
-    @SuppressWarnings({"unused", "resource"})
-    public static Server start(final IFn clojureHandler, final int port) {
-        final Config config = Config.builder(clojureHandler).port(port).build();
-        return new Server(config).init();
+    @Override
+    public String toString() {
+        return String.format("<Server %s:%s, handler: %s>",
+                config.host(),
+                config.port(),
+                ringHandler.toString()
+        );
+    }
+
+    @SuppressWarnings("unused")
+    public static Server start(final IFn clojureHandler) {
+        return start(clojureHandler, Config.DEFAULT);
     }
 
     @SuppressWarnings({"unused", "resource"})
-    public static Server start(final Config config) {
-        return new Server(config).init();
+    public static Server start(final IFn ringHandler, final Config config) {
+        return new Server(ringHandler, config).init();
     }
 
     private Server init() {
@@ -37,7 +47,7 @@ public class Server implements AutoCloseable {
         } catch (IOException e) {
             throw Err.error(e, "failed to create HTTP server, addr: %s", address);
         }
-        final Handler javaHandler = new Handler(config.ringHandler());
+        final Handler javaHandler = new Handler(ringHandler);
         httpServer.createContext(config.root_path(), javaHandler);
         final int threads = config.threads();
         Executor executor;

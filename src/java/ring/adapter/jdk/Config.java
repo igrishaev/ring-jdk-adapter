@@ -1,11 +1,8 @@
 package ring.adapter.jdk;
 
-import clojure.lang.IFn;
-
 import java.util.concurrent.Executor;
 
 public record Config(
-        IFn ringHandler,
         String host,
         int port,
         int stop_delay_sec,
@@ -15,17 +12,15 @@ public record Config(
         int socket_backlog
 ) {
 
-    public static Builder builder(final IFn ringHandler) {
-        return new Builder(ringHandler);
+    @SuppressWarnings("unused")
+    public static Config DEFAULT = builder().build();
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     public static class Builder {
 
-        public Builder(final IFn ringHandler) {
-            this.ringHandler = ringHandler;
-        }
-
-        private final IFn ringHandler;
         private String host = Const.host;
         private int port = Const.port;
         private int stop_delay_sec = Const.stop_delay_sec;
@@ -78,7 +73,6 @@ public record Config(
 
         public Config build() {
             return new Config(
-                    ringHandler,
                     host,
                     port,
                     stop_delay_sec,

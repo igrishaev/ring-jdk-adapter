@@ -35,6 +35,7 @@ public class Handler implements HttpHandler {
         final String protocol = httpExchange.getProtocol();
         final String method = httpExchange.getRequestMethod();
         final URI uri = httpExchange.getRequestURI();
+        final String queryString = uri.getQuery();
         final InputStream body = httpExchange.getRequestBody();
         final InetSocketAddress remoteAddress = httpExchange.getRemoteAddress();
         final Headers headers = httpExchange.getRequestHeaders();
@@ -47,7 +48,7 @@ public class Handler implements HttpHandler {
                 KW.protocol, protocol,
                 KW.remote_addr, remoteAddress.toString(),
                 KW.request_method, method,
-                // KW.scheme, "dunno",
+                KW.query_string, queryString,
                 KW.headers, toClojureHeaders(headers),
                 KW.server_name, serverName,
                 KW.server_port, serverPort

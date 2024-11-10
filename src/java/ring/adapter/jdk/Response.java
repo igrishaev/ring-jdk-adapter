@@ -52,6 +52,10 @@ public record Response (
             for (Map.Entry<?,?> me: m.entrySet()) {
                 k = me.getKey();
                 v = me.getValue();
+
+                // key: string, keyword -> transform, else throw
+                // value: to string, check for null
+
                 if (k instanceof String ks) {
                     if (v instanceof String vs) {
                         result.add(new Header(ks, vs));

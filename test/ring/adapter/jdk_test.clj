@@ -137,6 +137,19 @@
         (is (= "some string" (:body response)))))))
 
 
+(deftest test-server-return-missing-file
+  (let [file (io/file "some-file.test")]
+    (jdk/with-server [(constantly
+                       {:status 200
+                        :body file
+                        :headers {"content-type" "text/plain"}})
+                      {:port PORT}]
+      (let [{:keys [status body]}
+            (client/get URL {:throw-exceptions false})]
+        (is (= 500 status))
+        (is (str/includes? body "java.lang.RuntimeException: file not found: some-file.test"))))))
+
+
 (deftest test-server-return-iterable
   (let [items (for [x ["aaa" "bbb" "ccc" 1 :foo {:test 3} nil [1 2 3]]]
                 x)]
@@ -181,15 +194,98 @@
                (get-in request [:headers "X-test"])))))))
 
 
-;; exception in ring
-;; status < 100 or > 600
-;; broken response: status, headers, body
-;; read body
-;; fix method
-;; form-params
+(deftest test-server-header-multi-pass
+  (jdk/with-server [(fn [_]
+                      (/ 0 0))
+                    {:port PORT}]
+    (let [{:keys [status headers body]}
+          (client/get URL {:throw-exceptions false})]
+
+      (is (= 500 status))
+      (is (= "text/plain" (get headers "Content-Type")))
+
+      (is (str/includes? body "failed to execute ring handler"))
+      (is (str/includes? body "java.lang.ArithmeticException: Divide by zero"))
+      (is (str/includes? body "\tat clojure.lang.Numbers.divide")))))
+
+
+(deftest test-server-status>500
+  (jdk/with-server [(constantly
+                     {:status 999
+                      :body "test"
+                      :headers {"content-type" "text/plain"}})
+                    {:port PORT}]
+    (let [{:keys [status]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 999 status)))))
+
+
+(deftest test-server-status-only
+  (jdk/with-server [(constantly
+                     {:status 200})
+                    {:port PORT}]
+    (let [{:keys [status headers body]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 200 status))
+      (is (= {"Transfer-encoding" "chunked"}
+             (dissoc headers "Date")))
+      (is (= "" body)))))
+
+
+(deftest test-server-status-nil
+  (jdk/with-server [(constantly {:status nil})
+                    {:port PORT}]
+    (let [{:keys [status body]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 500 status))
+      (is (str/includes? body "java.lang.RuntimeException: ring status is not integer: null")))))
+
+
+(deftest test-server-ring-response-nil
+  (jdk/with-server [(constantly nil)
+                    {:port PORT}]
+    (let [{:keys [status body]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 500 status))
+      (is (str/includes? body "java.lang.RuntimeException: unsupported ring response: null")))))
+
+
+(deftest test-server-body-nil
+  (jdk/with-server [(constantly {:status 200
+                                 :body nil})
+                    {:port PORT}]
+    (let [{:keys [status body]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 200 status))
+      (is (= "" body)))))
+
+
+(deftest test-server-headers-nil
+  (jdk/with-server [(constantly {:status 200
+                                 :headers nil})
+                    {:port PORT}]
+    (let [{:keys [status body]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 200 status))
+      (is (= "" body)))))
+
+
+#_
+(deftest test-server-headers-nil
+  (jdk/with-server [(constantly {:status 200
+                                 :headers {"X-Some-Metric" "42"}
+                                 :body "aa"})
+                    {:port PORT}]
+    (let [{:keys [status headers body]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 200 status))
+      (is (= 1 headers))
+      (is (= "" body)))))
+
+
+
 ;; some middleware: wrap-params, kw-params
-;; file doesn't exist
-;; ring response nil
-;; status null
-;; header null
-;; body null
+;; form-params
+
+;; header keyword
+;; header value integer

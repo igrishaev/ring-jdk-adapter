@@ -92,7 +92,9 @@ public class Handler implements HttpHandler {
         final Iterable<?> bodyIter = response.bodyIter();
         if (bodyIter != null) {
             for (Object x: bodyIter) {
-                IO.transfer(x.toString(), out);
+                if (x != null) {
+                    IO.transfer(x.toString(), out);
+                }
             }
         }
         IO.close(out);

@@ -5,6 +5,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import clojure.lang.Keyword;
 import clojure.lang.RT;
 
 public record Response (
@@ -39,6 +41,16 @@ public record Response (
         }
     }
 
+    public static String toHeaderKey(final Object x) {
+        if (x instanceof String s) {
+            return s;
+        } else if (x instanceof Keyword kw) {
+            return KW.KWtoString(kw);
+        } else {
+            throw Err.error("unsupported header key: %s", x);
+        }
+    }
+
     public static List<Header> getHeaders(final Map<?,?> ringResponse) {
         final Object x = ringResponse.get(KW.headers);
 
@@ -47,29 +59,24 @@ public record Response (
         }
 
         if (x instanceof Map<?,?> m) {
-            Object k, v;
+            String k;
+            Object v;
             final List<Header> result = new ArrayList<>(m.size());
             for (Map.Entry<?,?> me: m.entrySet()) {
-                k = me.getKey();
+                k = toHeaderKey(me.getKey());
                 v = me.getValue();
-
-                // key: string, keyword -> transform, else throw
-                // value: to string, check for null
-
-                if (k instanceof String ks) {
-                    if (v instanceof String vs) {
-                        result.add(new Header(ks, vs));
-                    } else if (v instanceof Iterable<?> iterable) {
-                        for (Object vi : iterable) {
-                            if (vi instanceof String vis) {
-                                result.add(new Header(ks, vis));
-                            } else {
-                                throw Err.error("unsupported header value: %s", vi);
-                            }
+                if (v instanceof String vs) {
+                    result.add(new Header(k, vs));
+                } else if (v instanceof Iterable<?> iterable) {
+                    for (Object vi : iterable) {
+                        if (vi instanceof String vis) {
+                            result.add(new Header(k, vis));
+                        } else if (vi != null) {
+                            result.add(new Header(k, vi.toString()));
                         }
                     }
-                } else {
-                    throw Err.error("header name is not a string: %s", k);
+                } else if (v != null) {
+                    result.add(new Header(k, v.toString()));
                 }
             }
             return result;

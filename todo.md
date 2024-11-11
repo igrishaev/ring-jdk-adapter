@@ -1,4 +1,6 @@
 
+docstrings
+readme
 bench
 - default
 - fixed threads

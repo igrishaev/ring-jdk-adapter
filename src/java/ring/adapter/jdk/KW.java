@@ -21,6 +21,10 @@ public class KW {
     public static final Keyword delete = Keyword.intern("delete");
     public static final Keyword patch = Keyword.intern("patch");
     public static final Keyword options = Keyword.intern("options");
+
+    public static String KWtoString(final Keyword kw) {
+        return kw.toString().substring(1);
+    }
 }
 
 

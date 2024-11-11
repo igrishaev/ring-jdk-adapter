@@ -3,6 +3,9 @@
    (ring.adapter.jdk Server
                      Config)))
 
+(set! *warn-on-reflection* true)
+
+
 (defn ->Config ^Config [opt]
   (if (empty? opt)
     Config/DEFAULT

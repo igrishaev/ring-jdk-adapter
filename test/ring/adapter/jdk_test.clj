@@ -319,17 +319,40 @@
 
 
 (deftest test-server-header-value-non-string
-  (jdk/with-server [(constantly {:status 200
-                                 :headers {"X-Some-Metric" 42}})
+  (jdk/with-server [(constantly
+                     {:status 200
+                      :headers
+                      {"X-Metric-A" 42
+                       "X-Metric-B" nil
+                       "X-Metric-C" true
+                       "X-Metric-D" ["A" "B" 123 nil :hello]}})
                     {:port PORT}]
     (let [{:keys [status headers body]}
           (client/get URL {:throw-exceptions false})]
       (is (= 200 status))
-      (is (= 1 headers)))))
+      (is (= {"X-metric-d" ["A" "B" "123" ":hello"],
+              "X-metric-a" "42",
+              "X-metric-c" "true"}
+             (dissoc headers "Date" "Transfer-encoding"))))))
 
-;; header todos
-;; header value nil
-;; header key keyword
-;; header key non-string
-;; header keyword
-;; header value integer
+
+(deftest test-server-header-key-keyword
+  (jdk/with-server [(constantly
+                     {:status 200
+                      :headers {:hello/foo 42}})
+                    {:port PORT}]
+    (let [{:keys [status headers body]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 200 status))
+      (is (= "42" (get headers "Hello/foo"))))))
+
+
+(deftest test-server-header-key-weird
+  (jdk/with-server [(constantly
+                     {:status 200
+                      :headers {42 42}})
+                    {:port PORT}]
+    (let [{:keys [status headers body]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 500 status))
+      (is (str/includes? body "unsupported header key: 42")))))

@@ -6,6 +6,9 @@
    [clojure.java.io :as io]
    [clojure.string :as str]
    [clojure.test :refer [deftest is]]
+   [ring.middleware.params :refer [wrap-params]]
+   [ring.middleware.keyword-params :refer [wrap-keyword-params]]
+   [ring.middleware.multipart-params :refer [wrap-multipart-params]]
    [ring.adapter.jdk :as jdk]))
 
 
@@ -76,16 +79,16 @@
             request @capture!]
         (is (= {:protocol "HTTP/1.1",
                 :headers
-                {"Accept-encoding" "gzip, deflate",
-                 "Connection" "close",
-                 "Host" "127.0.0.1:8081"},
+                {"accept-encoding" "gzip, deflate",
+                 "connection" "close",
+                 "host" "127.0.0.1:8081"},
                 :server-port 8081,
                 :server-name "localhost"
                 :query-string nil
                 :uri "/",
                 :request-method :get}
                (-> request
-                   (update :headers dissoc "User-agent")
+                   (update :headers dissoc "user-agent")
                    (dissoc :body
                            :remote-addr))))))))
 
@@ -270,22 +273,63 @@
       (is (= "" body)))))
 
 
-#_
-(deftest test-server-headers-nil
+(deftest test-server-params-middleware
+  (let [request! (atom nil)
+        handler (-> request!
+                    handler-capture
+                    wrap-keyword-params
+                    wrap-params
+                    wrap-multipart-params)]
+
+    ;; check GET
+    (jdk/with-server [handler {:port PORT}]
+      (let [{:keys [status headers body]}
+            (client/get URL {:query-params {:q1 "ABC" :q2 "XYZ"}
+                             :throw-exceptions false})
+
+            request
+            @request!]
+
+        (is (= 200 status))
+
+        (is (= {"q1" "ABC" "q2" "XYZ"}
+               (:query-params request)))
+
+        (is (= {:q1 "ABC" :q2 "XYZ"}
+               (:params request))))
+
+      ;; check POST
+      (let [{:keys [status headers body]}
+            (client/post URL {:form-params {:f1 "AAA" :f2 "BBB"}
+                              :throw-exceptions false})
+
+            request
+            @request!]
+
+        (is (= 200 status))
+
+        (is (= {}
+               (:query-params request)))
+
+        (is (= {"f1" "AAA" "f2" "BBB"}
+               (:form-params request)))
+
+        (is (= {:f1 "AAA" :f2 "BBB"}
+               (:params request)))))))
+
+
+(deftest test-server-header-value-non-string
   (jdk/with-server [(constantly {:status 200
-                                 :headers {"X-Some-Metric" "42"}
-                                 :body "aa"})
+                                 :headers {"X-Some-Metric" 42}})
                     {:port PORT}]
     (let [{:keys [status headers body]}
           (client/get URL {:throw-exceptions false})]
       (is (= 200 status))
-      (is (= 1 headers))
-      (is (= "" body)))))
+      (is (= 1 headers)))))
 
-
-
-;; some middleware: wrap-params, kw-params
-;; form-params
-
+;; header todos
+;; header value nil
+;; header key keyword
+;; header key non-string
 ;; header keyword
 ;; header value integer

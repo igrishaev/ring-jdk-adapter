@@ -21,11 +21,14 @@ public class Handler implements HttpHandler {
 
     private static IPersistentMap toClojureHeaders(final Headers headers) {
         IPersistentMap result = PersistentHashMap.EMPTY;
+        String header;
         for (Map.Entry<String, List<String>> me: headers.entrySet()) {
+            // ring relies on lower-cased headers
+            header = me.getKey().toLowerCase();
             if (me.getValue().size() == 1) {
-                result = result.assoc(me.getKey(), me.getValue().get(0));
+                result = result.assoc(header, me.getValue().get(0));
             } else {
-                result = result.assoc(me.getKey(), PersistentVector.create(me.getValue()));
+                result = result.assoc(header, PersistentVector.create(me.getValue()));
             }
         }
         return result;

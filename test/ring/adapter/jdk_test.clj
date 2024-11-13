@@ -356,3 +356,6 @@
           (client/get URL {:throw-exceptions false})]
       (is (= 500 status))
       (is (str/includes? body "unsupported header key: 42")))))
+
+;; TODO: root-path
+;; TODO: threads

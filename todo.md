@@ -1,3 +1,4 @@
 
 docstrings
-readme
+correct readme
+add tests

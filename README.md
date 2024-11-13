@@ -1,44 +1,19 @@
-# ring-jdk-adapter
+# Ring JDK Adapter
 
-FIXME: description
+Ring JDK adapter is a small wrapper on top of the built-in HTTP server available
+in Java.
+
+com.sun.net.httpserver
+HttpServer
 
 ## Installation
 
-Download from http://example.com/FIXME.
+## Quick Demo
 
-## Usage
+## Parameters
 
-FIXME: explanation
+## Benchmarks
 
-    $ java -jar ring-jdk-adapter-0.1.0-standalone.jar [args]
+<img src="media/chart_1.svg" width=75% height=auto>
 
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
-
-## License
-
-Copyright © 2024 FIXME
-
-This program and the accompanying materials are made available under the
-terms of the Eclipse Public License 2.0 which is available at
-http://www.eclipse.org/legal/epl-2.0.
-
-This Source Code may also be made available under the following Secondary
-Licenses when the conditions for such availability set forth in the Eclipse
-Public License, v. 2.0 are satisfied: GNU General Public License as published by
-the Free Software Foundation, either version 2 of the License, or (at your
-option) any later version, with the GNU Classpath Exception which is available
-at https://www.gnu.org/software/classpath/license.html.
+Ivan Grishaev, 2024

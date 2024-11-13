@@ -52,4 +52,11 @@
     {*warn-on-reflection* true
      *assert* true}}
    :test
-   {:source-paths ["test"]}})
+   {:source-paths ["test"]}
+
+   :demo
+   {:dependencies [[org.clojure/clojure]]
+    :source-paths ["dev"]
+    :main ^:skip-aot demo.main
+    :aot :all
+    :jvm-opts ["-Dclojure.compiler.direct-linking=true"]}})

@@ -1,9 +1,7 @@
 (ns bench
   (:import
-   org.eclipse.jetty.util.thread.QueuedThreadPool
    java.util.concurrent.Executors)
   (:require
-   [ring.adapter.jetty :as jetty]
    [ring.adapter.jdk :as jdk]))
 
 (defn handler [request]
@@ -12,6 +10,12 @@
    :body "hello"})
 
 (comment
+
+  (require
+   '[ring.adapter.jetty :as jetty])
+
+  (import
+   'org.eclipse.jetty.util.thread.QueuedThreadPool)
 
   (def -exe
     (Executors/newVirtualThreadPerTaskExecutor))

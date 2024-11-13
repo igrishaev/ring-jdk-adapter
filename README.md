@@ -33,7 +33,57 @@ com.github.igrishaev/ring-jdk-adapter {:mvn/version "0.1.0-SNAPSHOT"}
 
 ## Quick Demo
 
+Import the namespace, declare a Ring handler as usual:
+
+~~~clojure
+(ns demo
+  (:require
+   [ring.adapter.jdk :as jdk]))
+
+(defn handler [request]
+  {:status 200
+   :headers {"Content-Type" "text/plain"}
+   :body "Hello world!"})
+~~~
+
+Pass it into the `server` function and check the http://127.0.0.1:8082 page in
+your browser:
+
+~~~clojure
+(def server
+  (jdk/server handler {:port 8082}))
+~~~
+
+The `server` function returns an instance of the `Server` class. To stop it,
+pass the result into `jdk/stop` or `jdk/close` functions:
+
+~~~clojure
+(jdk/stop server)
+~~~
+
+Since the `Server` class implements `AutoCloseable` interface, it's compatible
+with the `with-open` macro:
+
+~~~clojure
+(with-open [server (jdk/server handler)]
+  ...)
+~~~
+
+The server gets closed once you've exited the macro. here is a similar
+`with-server` macro which acts the same:
+
+~~~clojure
+(jdk/with-server [handler]
+  ...)
+~~~
+
 ## Parameters
+
+## Body Type
+
+## Middleware
+
+## Exception Handling
 
 ## Benchmarks
 

@@ -1,13 +1,13 @@
 (def MIN_JAVA_VERSION "16")
 (def RING_VERSION "1.13.0")
 
-(defproject ring-jdk-adapter "0.1.0-SNAPSHOT"
+(defproject com.github.igrishaev/ring-jdk-adapter "0.1.0-SNAPSHOT"
 
   :description
-  "FIXME: write description"
+  "Zero-deps Ring server on top of jdk.httpserver"
 
   :url
-  "http://example.com/FIXME"
+  "https://github.com/igrishaev/ring-jdk-adapter"
 
   :pom-addition
   [:properties
@@ -25,6 +25,17 @@
    "snapshots"
    {:url "https://repo.clojars.org"
     :creds :gpg}}
+
+  :release-tasks
+  [["vcs" "assert-committed"]
+   ["change" "version" "leiningen.release/bump-version" "release"]
+   ["vcs" "commit"]
+   ["vcs" "tag" "--no-sign"]
+   ["with-profile" "uberjar" "install"]
+   ["with-profile" "uberjar" "deploy"]
+   ["change" "version" "leiningen.release/bump-version"]
+   ["vcs" "commit"]
+   ["vcs" "push"]]
 
   :source-paths ["src/clj"]
   :java-source-paths ["src/java"]

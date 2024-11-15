@@ -14,7 +14,7 @@ something quick and simple.
 
 Since version 9 or 11 (I don't remember for sure), Java ships its own HTTP
 server. The package name is `com.sun.net.httpserver` and the module name is
-`jdk.httpserver`. The library provides an adapter to serve Ring handles. It's
+`jdk.httpserver`. The library provides an adapter to serve Ring handlers. It's
 completely free from any dependencies.
 
 Ring JDK Adapter is a great choice for local HTTP stubs or mock services that

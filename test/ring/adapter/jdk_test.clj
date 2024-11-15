@@ -15,7 +15,7 @@
 (def PORT 8081)
 
 (def URL
-  (format "http://127.0.0.1:%s/" PORT))
+  (format "http://127.0.0.1:%s" PORT))
 
 
 (defn simplify [response]
@@ -263,6 +263,35 @@
       (is (= "" body)))))
 
 
+(deftest test-server-threads-ok
+  (jdk/with-server [(constantly {:status 200})
+                    {:port PORT
+                     :threads 8}]
+    (let [{:keys [status body]}
+          (client/get URL {:throw-exceptions false})]
+      (is (= 200 status))
+      (is (= "" body)))))
+
+
+(deftest test-server-root-path
+  (let [request! (atom nil)]
+    (jdk/with-server [(handler-capture request!)
+                      {:port PORT
+                       :root-path "/some/prefix"}]
+
+      (let [{:keys [status body]}
+            (client/get URL {:throw-exceptions false})]
+        (is (= nil @request!))
+        (is (= 404 status))
+        (is (= "<h1>404 Not Found</h1>No context found for request" body)))
+
+      (let [{:keys [status body]}
+            (client/get (str URL "/some/prefix/hello") {:throw-exceptions false})]
+        (is (= "/some/prefix/hello"
+               (:uri @request!)))
+        (is (= 200 status))
+        (is (= "hello" body))))))
+
 (deftest test-server-headers-nil
   (jdk/with-server [(constantly {:status 200
                                  :headers nil})
@@ -356,6 +385,3 @@
           (client/get URL {:throw-exceptions false})]
       (is (= 500 status))
       (is (str/includes? body "unsupported header key: 42")))))
-
-;; TODO: root-path
-;; TODO: threads

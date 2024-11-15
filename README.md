@@ -1,23 +1,23 @@
 # Ring JDK Adapter
 
-Ring JDK Adapter is a small wrapper on top of the built-in `jdk.httpserver` HTTP
-server available in Java. It's like Jetty but has no dependencies. It's almost
-as fast as Jetty, too (see benchmars below).
+Ring JDK Adapter is a small wrapper on top of a built-in HTTP server available
+in Java. It's like Jetty but has no dependencies. It's almost as fast as Jetty,
+too (see benchmars below).
 
 ## Why
 
-Sometimes you'd like to run a local HTTP server in Clojure, e.g. for testing or
-mocking purposes. There is a number of adapters for Ring, and all of them rely
-on third party servers like Jetty, Undertow, etc. To run them, you have to
-download plenty of dependencies. This is tolerable to some extend, yet sometimes
-you really want something quick and simple.
+Sometimes you want a local HTTP server in Clojure, e.g. for testing or mocking
+purposes. There is a number of adapters for Ring but all of them rely on third
+party servers like Jetty, Undertow, etc. Running them means to fetch plenty of
+dependencies. This is tolerable to some extend, yet sometimes you really want
+something quick and simple.
 
-Since version 9 or 11 (I don't remember for sure), Java ships it's own HTTP
+Since version 9 or 11 (I don't remember for sure), Java ships its own HTTP
 server. The package name is `com.sun.net.httpserver` and the module name is
-`jdk.httpserver`. This library provides an adapter that serves Ring
-handles. It's completely free from any dependencies.
+`jdk.httpserver`. The library provides an adapter to serve Ring handles. It's
+completely free from any dependencies.
 
-Ring JDK Adapter is a great choice for local HTTP stubs, or mock services that
+Ring JDK Adapter is a great choice for local HTTP stubs or mock services that
 mimic HTTP services. Despite some people think it's for development purposes
 only, the server is pretty fast! One can use it even in production.
 
@@ -55,7 +55,7 @@ your browser:
 ~~~
 
 The `server` function returns an instance of the `Server` class. To stop it,
-pass the result into the `jdk/stop` or `jdk/close` function:
+pass the result into the `jdk/stop` or `jdk/close` functions:
 
 ~~~clojure
 (jdk/stop server)
@@ -65,21 +65,22 @@ Since the `Server` class implements `AutoCloseable` interface, it's compatible
 with the `with-open` macro:
 
 ~~~clojure
-(with-open [server (jdk/server handler)]
+(with-open [server (jdk/server handler opt?)]
   ...)
 ~~~
 
-The server gets closed once you've exited the macro. here is a similar
+The server gets closed once you've exited the macro. Here is a similar
 `with-server` macro which acts the same:
 
 ~~~clojure
-(jdk/with-server [handler]
+(jdk/with-server [handler opt?]
   ...)
 ~~~
 
 ## Parameters
 
-The `server` function accepts an optional map of the following parameters:
+The `server` function and the `with-server` macro accept the second optional map
+of the parameters:
 
 | Name              | Default   | Description                                                                   |
 |-------------------|-----------|-------------------------------------------------------------------------------|
@@ -95,27 +96,28 @@ Example:
 
 ~~~clojure
 (def server
-  (jdk/server handler {:host "0.0.0.0"
-                       :port 8800
-                       :threads 8
-                       :root-path "/my/app"}))
+  (jdk/server handler
+              {:host "0.0.0.0" ;; listen all addresses
+               :port 8800      ;; a custom port
+               :threads 8      ;; use custom fixed trhead executor
+               :root-path "/my/app"}))
 ~~~
 
-When run, this handler will be available by the address
+When run, the handler above is be available by the address
 http://127.0.0.1:8800/my/app in the browser.
 
 ## Body Type
 
 JDK adapter supports the following response `:body` types:
 
-- `String`
-- `InputStream`
-- `File`
-- `Iterable<?>`
-- `null`
+- `java.lang.String`
+- `java.io.InputStream`
+- `java.io.File`
+- `java.lang.Iterable<?>` (see below)
+- `null` (nothing gets sent)
 
-When the body is iterable, every item gets sent as a string in UTF-8
-encoding. Null values are skipped.
+When the body is `Iterable` (might be a lazy seq as well), every item is sent as
+a string in UTF-8 encoding. Null values are skipped.
 
 ## Middleware
 
@@ -137,14 +139,14 @@ your handler with the standard middleware:
 ~~~
 
 The wrapped handler will receive a `request` map with parsed `:query-params`,
-`:form-params`, and `:params` fields. But these middleware come from the
-`ring-core` library which you need to add into dependencies. The same applies to
+`:form-params`, and `:params` fields. These middleware come from the `ring-core`
+library which you need to add into your dependencies. The same applies to
 handling JSON and the `ring-json` library.
 
 ## Exception Handling
 
-If something gets wrong during request handling, you'll get a plain text page
-with a short message and the stack trace:
+If something gets wrong while handling a request, you'll get a plain text page
+with a short message and a stack trace:
 
 ~~~clojure
 (defn handler [request]
@@ -154,7 +156,7 @@ with a short message and the stack trace:
    :body "hello"})
 ~~~
 
-The result:
+This is what you'll get in the browser:
 
 ~~~text
 failed to execute ring handler
@@ -176,7 +178,7 @@ java.lang.ArithmeticException: Divide by zero
 	at java.base/java.lang.Thread.run(Thread.java:1575)
 ~~~
 
-To prevent this date from being leaked to the client, use your own
+To prevent this data from being leaked to the client, use your own
 `wrap-exception` middleware, something like this:
 
 ~~~clojure
@@ -188,12 +190,12 @@ To prevent this date from being leaked to the client, use your own
         (log/errorf e ...)
         {:status 500
          :headers {...}
-         :body "<your custom HTML response>"}))))
+         :body "No cigar! Roll again!"}))))
 ~~~
 
 ## Benchmarks
 
-As mentioned above, the JDK server, although though is for dev purposes only, is
+As mentioned above, the JDK server although though is for dev purposes only, is
 not so bad! The chart below proves it's almost as fast as Jetty. There are five
 attempts of `ab -l -n 1000 -c 50 ...` made against both Jetty and JDK servers
 (1000 requests in total, 50 parallel). The levels of RPS are pretty equal: about

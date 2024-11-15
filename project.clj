@@ -1,7 +1,7 @@
 (def MIN_JAVA_VERSION "16")
 (def RING_VERSION "1.13.0")
 
-(defproject com.github.igrishaev/ring-jdk-adapter "0.1.0-SNAPSHOT"
+(defproject com.github.igrishaev/ring-jdk-adapter "0.1.0"
 
   :description
   "Zero-deps Ring server on top of jdk.httpserver"

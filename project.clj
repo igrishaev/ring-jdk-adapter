@@ -44,10 +44,10 @@
                   "--release" ~MIN_JAVA_VERSION]
 
   :dependencies
-  []
+  [[org.clojure/clojure]]
 
   :managed-dependencies
-  [[org.clojure/clojure "1.11.1"]
+  [[org.clojure/clojure "1.8.0"]
    [ring/ring-core ~RING_VERSION]
    [ring/ring-jetty-adapter ~RING_VERSION]
    [clj-http "3.13.0"]]

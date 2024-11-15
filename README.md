@@ -25,10 +25,10 @@ only, the server is pretty fast! One can use it even in production.
 
 ~~~clojure
 ;; lein
-[com.github.igrishaev/ring-jdk-adapter "0.1.0-SNAPSHOT"]
+[com.github.igrishaev/ring-jdk-adapter "0.1.0"]
 
 ;; deps
-com.github.igrishaev/ring-jdk-adapter {:mvn/version "0.1.0-SNAPSHOT"}
+com.github.igrishaev/ring-jdk-adapter {:mvn/version "0.1.0"}
 ~~~
 
 Requires Java version at least 16, Clojure at least 1.8.0.

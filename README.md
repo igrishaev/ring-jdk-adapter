@@ -31,6 +31,8 @@ only, the server is pretty fast! One can use it even in production.
 com.github.igrishaev/ring-jdk-adapter {:mvn/version "0.1.0-SNAPSHOT"}
 ~~~
 
+Requires Java version at least 16 or above.
+
 ## Quick Demo
 
 Import the namespace, declare a Ring handler as usual:

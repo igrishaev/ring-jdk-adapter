@@ -1,7 +1,8 @@
 (def MIN_JAVA_VERSION "16")
 (def RING_VERSION "1.13.0")
+(def CLJ_VERSION "1.8.0")
 
-(defproject com.github.igrishaev/ring-jdk-adapter "0.1.0"
+(defproject com.github.igrishaev/ring-jdk-adapter "0.1.0-SNAPSHOT"
 
   :description
   "Zero-deps Ring server on top of jdk.httpserver"
@@ -47,7 +48,7 @@
   [[org.clojure/clojure]]
 
   :managed-dependencies
-  [[org.clojure/clojure "1.8.0"]
+  [[org.clojure/clojure ~CLJ_VERSION]
    [ring/ring-core ~RING_VERSION]
    [ring/ring-jetty-adapter ~RING_VERSION]
    [clj-http "3.13.0"]]

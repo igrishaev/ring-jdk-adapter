@@ -2,7 +2,7 @@
 (def RING_VERSION "1.13.0")
 (def CLJ_VERSION "1.8.0")
 
-(defproject com.github.igrishaev/ring-jdk-adapter "0.1.0"
+(defproject com.github.igrishaev/ring-jdk-adapter "0.1.1-SNAPSHOT"
 
   :description
   "Zero-deps Ring server on top of jdk.httpserver"

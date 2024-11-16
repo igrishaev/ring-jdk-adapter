@@ -4,6 +4,23 @@ Ring JDK Adapter is a small wrapper on top of a built-in HTTP server available
 in Java. It's like Jetty but has no dependencies. It's almost as fast as Jetty,
 too (see benchmars below).
 
+## Table of Contents
+
+<!-- toc -->
+
+- [Why](#why)
+- [Availability](#availability)
+- [Installation](#installation)
+- [Quick Demo](#quick-demo)
+- [Parameters](#parameters)
+- [Body Type](#body-type)
+- [Middleware](#middleware)
+- [Exception Handling](#exception-handling)
+- [HTTPs & SSL](#https--ssl)
+- [Benchmarks](#benchmarks)
+
+<!-- tocstop -->
+
 ## Why
 
 Sometimes you want a local HTTP server in Clojure, e.g. for testing or mocking
@@ -204,6 +221,11 @@ To prevent this data from being leaked to the client, use your own
          :headers {...}
          :body "No cigar! Roll again!"}))))
 ~~~
+
+## HTTPs & SSL
+
+At the moment, the adapter supports HTTP only. There is a pending TODO to make
+it also work with HTTPs and a custom SSL context.
 
 ## Benchmarks
 

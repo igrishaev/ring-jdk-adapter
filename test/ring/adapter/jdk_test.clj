@@ -424,10 +424,10 @@
           (slurp (:body request))
           (is false)
           (catch IOException e
-            (is (= "Stream is closed" (ex-message e)))))
+            (is (= "Stream is closed" (.getMessage e)))))
 
         (try
           (request/body-string request)
           (is false)
           (catch IOException e
-            (is (= "Stream is closed" (ex-message e)))))))))
+            (is (= "Stream is closed" (.getMessage e)))))))))

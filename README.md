@@ -52,10 +52,10 @@ first. Check out the following links:
 
 ~~~clojure
 ;; lein
-[com.github.igrishaev/ring-jdk-adapter "0.1.0"]
+[com.github.igrishaev/ring-jdk-adapter "0.1.1"]
 
 ;; deps
-com.github.igrishaev/ring-jdk-adapter {:mvn/version "0.1.0"}
+com.github.igrishaev/ring-jdk-adapter {:mvn/version "0.1.1"}
 ~~~
 
 Requires Java version at least 16, Clojure at least 1.8.0.

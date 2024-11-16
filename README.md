@@ -9,7 +9,7 @@ too (see benchmars below).
 Sometimes you want a local HTTP server in Clojure, e.g. for testing or mocking
 purposes. There is a number of adapters for Ring but all of them rely on third
 party servers like Jetty, Undertow, etc. Running them means to fetch plenty of
-dependencies. This is tolerable to some extend, yet sometimes you really want
+dependencies. This is tolerable to some extent, yet sometimes you really want
 something quick and simple.
 
 Since version 9 or 11 (I don't remember for sure), Java ships its own HTTP
@@ -20,6 +20,16 @@ completely free from any dependencies.
 Ring JDK Adapter is a great choice for local HTTP stubs or mock services that
 mimic HTTP services. Despite some people think it's for development purposes
 only, the server is pretty fast! One can use it even in production.
+
+## Availability
+
+It's worth mentioning that some Java installations may miss the `jdk.httpserver`
+module. Please ensure the JVM you're using in production supports it
+first. Check out the following links:
+
+- [StackOverflow: Is package com.sun.net.httpserver
+  standard?](https://stackoverflow.com/questions/58764710/is-package-com-sun-net-httpserver-standard)
+- [Java® Platform, Standard Edition & Java Development Kit Version 21 API Specification](https://docs.oracle.com/en/java/javase/21/docs/api/index.html)
 
 ## Installation
 

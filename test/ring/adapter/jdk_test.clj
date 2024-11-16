@@ -1,15 +1,16 @@
 (ns ring.adapter.jdk-test
   (:import
-   java.io.File)
+   (java.io File IOException))
   (:require
    [clj-http.client :as client]
    [clojure.java.io :as io]
    [clojure.string :as str]
    [clojure.test :refer [deftest is]]
-   [ring.middleware.params :refer [wrap-params]]
+   [ring.adapter.jdk :as jdk]
    [ring.middleware.keyword-params :refer [wrap-keyword-params]]
    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
-   [ring.adapter.jdk :as jdk]))
+   [ring.middleware.params :refer [wrap-params]]
+   [ring.util.request :as request]))
 
 
 (def PORT 8081)
@@ -75,7 +76,7 @@
   (let [capture! (atom nil)]
     (jdk/with-server [(handler-capture capture!)
                       {:port PORT}]
-      (let [_ (client/get URL)
+      (let [_ (client/get (str URL "/hello?foo=1&bar=2"))
             request @capture!]
         (is (= {:protocol "HTTP/1.1",
                 :headers
@@ -84,8 +85,9 @@
                  "host" "127.0.0.1:8081"},
                 :server-port 8081,
                 :server-name "localhost"
-                :query-string nil
-                :uri "/",
+                :query-string "foo=1&bar=2"
+                :uri "/hello",
+                :scheme :http
                 :request-method :get}
                (-> request
                    (update :headers dissoc "user-agent")
@@ -385,3 +387,47 @@
           (client/get URL {:throw-exceptions false})]
       (is (= 500 status))
       (is (str/includes? body "unsupported header key: 42")))))
+
+
+(deftest test-server-ring-util-functions
+  (let [request! (atom nil)]
+    (jdk/with-server [(handler-capture request!)
+                      {:port PORT}]
+      (let [{:keys [status]}
+            (client/get (str URL "/foo/bar/baz?test=1")
+                        {:throw-exceptions false
+                         :headers {"content-type" "Text/Plain"
+                                   "content-Length" "42"}
+                         })
+
+            request
+            @request!]
+
+        (is (= 200 status))
+
+        (is (= :http
+               (:scheme request)))
+
+        (is (= "/foo/bar/baz"
+               (:uri request)))
+
+        (is (= "http://127.0.0.1:8081/foo/bar/baz?test=1"
+               (request/request-url request)))
+
+        (is (= "Text/Plain"
+               (request/content-type request)))
+
+        (is (= 42
+               (request/content-length request)))
+
+        (try
+          (slurp (:body request))
+          (is false)
+          (catch IOException e
+            (is (= "Stream is closed" (ex-message e)))))
+
+        (try
+          (request/body-string request)
+          (is false)
+          (catch IOException e
+            (is (= "Stream is closed" (ex-message e)))))))))

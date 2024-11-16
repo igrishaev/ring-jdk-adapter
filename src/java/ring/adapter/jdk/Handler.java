@@ -56,17 +56,20 @@ public class Handler implements HttpHandler {
         final Headers headers = httpExchange.getRequestHeaders();
         final int serverPort = httpExchange.getHttpContext().getServer().getAddress().getPort();
         final String serverName = httpExchange.getHttpContext().getServer().getAddress().getHostName();
+        final String uriString = uri.getPath();
 
         return PersistentHashMap.create(
                 KW.body, body,
-                KW.uri, uri.toString(),
+                KW.uri, uriString,
                 KW.protocol, protocol,
                 KW.remote_addr, remoteAddress.toString(),
                 KW.request_method, toClojureMethod(method),
                 KW.query_string, queryString,
                 KW.headers, toClojureHeaders(headers),
                 KW.server_name, serverName,
-                KW.server_port, serverPort
+                KW.server_port, serverPort,
+                // TODO: implement HTTPs/SSL
+                KW.scheme, KW.http
         );
     }
 

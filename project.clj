@@ -56,7 +56,7 @@
   :profiles
   {:dev
    {:source-paths ["dev"]
-    :dependencies [[org.clojure/clojure]
+    :dependencies [[org.clojure/clojure "1.11.3"] ;; for nrepl/cider
                    [ring/ring-core]
                    [ring/ring-jetty-adapter]
                    [clj-http]]

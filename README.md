@@ -41,11 +41,15 @@ only, the server is pretty fast! One can use it even in production.
 ## Availability
 
 It's worth mentioning that some Java installations may miss the `jdk.httpserver`
-module. Please ensure the JVM you're using in production supports it
-first. Check out the following links:
+module. Please ensure the JVM you're using in production supports it first. Here
+is the list of the JVMs I've checked manually:
 
-- [StackOverflow: Is package com.sun.net.httpserver
-  standard?](https://stackoverflow.com/questions/58764710/is-package-com-sun-net-httpserver-standard)
+- OpenJDK
+- GraalVM
+
+Check out the following links:
+
+- [StackOverflow: Is package com.sun.net.httpserver standard?](https://stackoverflow.com/questions/58764710/is-package-com-sun-net-httpserver-standard)
 - [Java® Platform, Standard Edition & Java Development Kit Version 21 API Specification](https://docs.oracle.com/en/java/javase/21/docs/api/index.html)
 
 ## Installation
@@ -128,7 +132,7 @@ Example:
   (jdk/server handler
               {:host "0.0.0.0" ;; listen all addresses
                :port 8800      ;; a custom port
-               :threads 8      ;; use custom fixed trhead executor
+               :threads 8      ;; use custom fixed thread executor
                :root-path "/my/app"}))
 ~~~
 

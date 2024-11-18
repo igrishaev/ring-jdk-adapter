@@ -53,6 +53,10 @@
    [ring/ring-jetty-adapter ~RING_VERSION]
    [clj-http "3.13.0"]]
 
+  ;; this is to test with custom JVMs locally
+  ;; :java-cmd
+  ;; "/Users/.../Contents/Home/bin/java"
+
   :profiles
   {:dev
    {:source-paths ["dev"]

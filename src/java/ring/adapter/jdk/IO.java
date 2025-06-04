@@ -9,6 +9,7 @@ public class IO {
     public static void transfer(final InputStream in, final OutputStream out) {
         try {
             in.transferTo(out);
+            out.flush();
         } catch (IOException e) {
             throw Err.error("could not transfer ab input stream into the output stream");
         }

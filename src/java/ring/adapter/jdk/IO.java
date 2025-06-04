@@ -18,6 +18,7 @@ public class IO {
         final byte[] buf = s.getBytes(StandardCharsets.UTF_8);
         try {
             out.write(buf);
+            out.flush();
         } catch (IOException e) {
             throw Err.error("could not transfer a string into the output stream");
         }

@@ -1,7 +1,26 @@
 
-## 0.1.2-SNAPSHOT
+## 0.1.5-SNAPSHOT
 
 - ?
+- ?
+- ?
+
+## 0.1.4-SNAPSHOT
+
+- ?
+- ?
+- ?
+
+## 0.1.3-SNAPSHOT
+
+- ?
+- ?
+- ?
+
+## 0.1.2
+
+- add flush calls @kumarshantanu
+- better deps
 
 ## 0.1.1
 

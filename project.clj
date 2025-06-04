@@ -45,13 +45,14 @@
                   "--release" ~MIN_JAVA_VERSION]
 
   :dependencies
-  [[org.clojure/clojure]]
+  [[org.clojure/clojure :scope "provided"]]
 
   :managed-dependencies
   [[org.clojure/clojure ~CLJ_VERSION]
    [ring/ring-core ~RING_VERSION]
    [ring/ring-jetty-adapter ~RING_VERSION]
-   [clj-http "3.13.0"]]
+   [clj-http "3.13.0"]
+   [commons-io/commons-io "2.19.0"]]
 
   ;; this is to test with custom JVMs locally
   ;; :java-cmd
@@ -62,7 +63,8 @@
    {:source-paths ["dev"]
     :dependencies [[ring/ring-core]
                    [ring/ring-jetty-adapter]
-                   [clj-http]]
+                   [clj-http]
+                   [commons-io/commons-io]]
     :global-vars
     {*warn-on-reflection* true
      *assert* true}}

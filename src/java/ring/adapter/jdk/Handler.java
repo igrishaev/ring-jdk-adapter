@@ -22,13 +22,20 @@ public class Handler implements HttpHandler {
     private static IPersistentMap toClojureHeaders(final Headers headers) {
         IPersistentMap result = PersistentHashMap.EMPTY;
         String header;
+        List<String> value;
+        String sep;
         for (Map.Entry<String, List<String>> me: headers.entrySet()) {
             // ring relies on lower-cased headers
             header = me.getKey().toLowerCase();
-            if (me.getValue().size() == 1) {
-                result = result.assoc(header, me.getValue().get(0));
+            value = me.getValue();
+            if (value.size() == 1) {
+                result = result.assoc(header, value.get(0));
             } else {
-                result = result.assoc(header, PersistentVector.create(me.getValue()));
+                // Since Ring 1.6, multiple headers get comma-joined:
+                // https://github.com/ring-clojure/ring/blob/master/CHANGELOG.md#160-rc3-2017-04-18
+                // https://github.com/ring-clojure/ring/blob/master/SPEC.md#headers
+                sep = (header.equals("cookie")) ? ";" : ",";
+                result = result.assoc(header, String.join(sep, value));
             }
         }
         return result;

@@ -46,7 +46,7 @@
    (File/createTempFile prefix suffix)))
 
 
-(defn handler-ok [request]
+(defn handler-ok [_request]
   RESP_HELLO)
 
 
@@ -175,8 +175,7 @@
                         :body items
                         :headers {"content-type" "text/plain"}})
                       {:port PORT}]
-      (let [response
-            (client/get URL)]
+      (let [response (client/get URL)]
         (is (= 200 (:status response)))
         (is (= "aaabbbccc1:foo{:test 3}[1 2 3]"
                (:body response)))))))
@@ -196,7 +195,7 @@
              (get headers "X-TEST"))))))
 
 
-(deftest test-server-header-multi-pass
+(deftest test-server-request-parse-multi-headers
   (let [request! (atom nil)]
     (jdk/with-server [(handler-capture request!)
                       {:port PORT}]
@@ -207,8 +206,8 @@
             @request!]
 
         (is (= 200 status))
-        (is (= ["foo" "bar" "baz"]
-               (get-in request [:headers "X-test"])))))))
+        (is (= "foo,bar,baz"
+               (get-in request [:headers "x-test"])))))))
 
 
 (deftest test-server-header-multi-pass
@@ -326,7 +325,7 @@
 
     ;; check GET
     (jdk/with-server [handler {:port PORT}]
-      (let [{:keys [status headers body]}
+      (let [{:keys [status]}
             (client/get URL {:query-params {:q1 "ABC" :q2 "XYZ"}
                              :throw-exceptions false})
 
@@ -342,7 +341,7 @@
                (:params request))))
 
       ;; check POST
-      (let [{:keys [status headers body]}
+      (let [{:keys [status]}
             (client/post URL {:form-params {:f1 "AAA" :f2 "BBB"}
                               :throw-exceptions false})
 
@@ -370,7 +369,7 @@
                        "X-Metric-C" true
                        "X-Metric-D" ["A" "B" 123 nil :hello]}})
                     {:port PORT}]
-    (let [{:keys [status headers body]}
+    (let [{:keys [status headers]}
           (client/get URL {:throw-exceptions false})]
       (is (= 200 status))
       (is (= {"X-metric-d" ["A" "B" "123" ":hello"],
@@ -384,7 +383,7 @@
                      {:status 200
                       :headers {:hello/foo 42}})
                     {:port PORT}]
-    (let [{:keys [status headers body]}
+    (let [{:keys [status headers]}
           (client/get URL {:throw-exceptions false})]
       (is (= 200 status))
       (is (= "42" (get headers "Hello/foo"))))))
@@ -395,7 +394,7 @@
                      {:status 200
                       :headers {42 42}})
                     {:port PORT}]
-    (let [{:keys [status headers body]}
+    (let [{:keys [status body]}
           (client/get URL {:throw-exceptions false})]
       (is (= 500 status))
       (is (str/includes? body "unsupported header key: 42")))))
@@ -409,8 +408,7 @@
             (client/get (str URL "/foo/bar/baz?test=1")
                         {:throw-exceptions false
                          :headers {"content-type" "Text/Plain"
-                                   "content-Length" "42"}
-                         })
+                                   "content-Length" "42"}})
 
             request
             @request!]

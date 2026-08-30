@@ -128,6 +128,18 @@
       (is (= "hello abc" (:body response))))))
 
 
+(deftest test-server-return-byte-array
+  (jdk/with-server [(constantly
+                     {:status 200
+                      :body (.getBytes "hello abc" "UTF-8")
+                      :headers {"content-type" "text/plain"}})
+                    {:port PORT}]
+    (let [response (client/get URL)]
+      (is (= 200 (:status response)))
+      (is (= "hello abc" (:body response)))
+      (is (= "9" (some-> response :headers (get "content-length")))))))
+
+
 (deftest test-server-return-file
   (let [file (get-temp-file)
         _ (spit file "some string")]

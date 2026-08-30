@@ -103,6 +103,9 @@ public record Response (
                 final byte[] buf = s.getBytes(StandardCharsets.UTF_8);
                 bodyStream = new ByteArrayInputStream(buf);
                 contentLength = buf.length;
+            } else if (bodyObj instanceof byte[] ba) {
+                bodyStream = new ByteArrayInputStream(ba);
+                contentLength = ba.length;
             } else if (bodyObj == null) {
                 bodyStream = InputStream.nullInputStream();
             } else if (bodyObj instanceof Iterable<?> i) {

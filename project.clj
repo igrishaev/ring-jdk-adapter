@@ -61,7 +61,8 @@
   :profiles
   {:dev
    {:source-paths ["dev"]
-    :dependencies [[ring/ring-core]
+    :dependencies [[org.clojure/clojure]
+                   [ring/ring-core]
                    [ring/ring-jetty-adapter]
                    [clj-http]
                    [commons-io/commons-io]]

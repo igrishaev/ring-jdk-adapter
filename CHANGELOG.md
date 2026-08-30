@@ -5,11 +5,9 @@
 - ?
 - ?
 
-## 0.1.4-SNAPSHOT
+## 0.1.4
 
-- ?
-- ?
-- ?
+- #5 handling multiple headers properly
 
 ## 0.1.3
 

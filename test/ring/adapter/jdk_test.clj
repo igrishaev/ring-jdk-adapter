@@ -181,6 +181,20 @@
                (:body response)))))))
 
 
+(deftest test-server-return-iterable-exception
+  (let [items (for [x (range 1000)]
+                (throw (ex-info "aaa" {:x x})))]
+    (jdk/with-server [(constantly
+                       {:status 200
+                        :body items
+                        :headers {"content-type" "text/plain"}})
+                      {:port PORT}]
+      (let [response (client/get URL)]
+        (is (= 200 (:status response)))
+        (is (= 1
+               (:body response)))))))
+
+
 (deftest test-server-header-multi-return
   (jdk/with-server [(constantly
                      {:status 200

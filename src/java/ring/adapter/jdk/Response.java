@@ -90,7 +90,7 @@ public record Response (
             final List<Header> headers = getHeaders(ringResponse);
 
             final Object bodyObj = ringResponse.get(KW.body);
-            InputStream bodyStream = null;
+            final InputStream bodyStream;
             Iterable<?> bodyIter = null;
             long contentLength = 0;
 
@@ -109,6 +109,7 @@ public record Response (
             } else if (bodyObj == null) {
                 bodyStream = InputStream.nullInputStream();
             } else if (bodyObj instanceof Iterable<?> i) {
+                bodyStream = InputStream.nullInputStream();
                 bodyIter = i;
             } else {
                 throw Err.error("unsupported ring body: %s", bodyObj);

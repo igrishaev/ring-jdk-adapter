@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.*;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.net.URI;
@@ -91,30 +92,31 @@ public class Handler implements HttpHandler {
         }
     }
 
-    private void sendResponse(final Response response, final HttpExchange exchange) {
+    private void sendResponse(final Response response, final HttpExchange exchange) throws IOException {
         final Headers headers = exchange.getResponseHeaders();
         for (Header h: response.headers()) {
             headers.add(h.k(), h.v());
         }
         sendStatus(exchange, response.status(), response.contentLength());
-        final OutputStream out = exchange.getResponseBody();
-        final InputStream bodyStream = response.bodyStream();
-        if (bodyStream != null) {
-            IO.transfer(bodyStream, out);
-        }
-        final Iterable<?> bodyIter = response.bodyIter();
-        if (bodyIter != null) {
-            for (Object x: bodyIter) {
-                if (x != null) {
-                    IO.transfer(x.toString(), out);
+        try (final OutputStream out = exchange.getResponseBody()) {
+            final Iterable<?> bodyIter = response.bodyIter();
+            if (bodyIter != null) {
+                final
+                for (Object x: bodyIter) {
+                    if (x != null) {
+                        out.write(x.toString().getBytes(StandardCharsets.UTF_8));
+                    }
+                }
+            } else {
+                try (final InputStream bodyStream = response.bodyStream()) {
+                    bodyStream.transferTo(out);
                 }
             }
         }
-        IO.close(out);
     }
 
     @Override
-    public void handle(HttpExchange exchange) {
+    public void handle(HttpExchange exchange) throws IOException {
         final Map<?,?> request = toRequest(exchange);
         Object ringResponse;
         Response javaResponse;

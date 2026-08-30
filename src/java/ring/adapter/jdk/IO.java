@@ -6,25 +6,6 @@ import java.nio.charset.StandardCharsets;
 
 public class IO {
 
-    public static void transfer(final InputStream in, final OutputStream out) {
-        try {
-            in.transferTo(out);
-            out.flush();
-        } catch (IOException e) {
-            throw Err.error("could not transfer ab input stream into the output stream");
-        }
-    }
-
-    public static void transfer(final String s, final OutputStream out) {
-        final byte[] buf = s.getBytes(StandardCharsets.UTF_8);
-        try {
-            out.write(buf);
-            out.flush();
-        } catch (IOException e) {
-            throw Err.error("could not transfer a string into the output stream");
-        }
-    }
-
     public static InputStream toInputStream(final File file) {
         try {
             return new FileInputStream(file);

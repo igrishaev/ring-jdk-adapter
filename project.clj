@@ -1,6 +1,6 @@
 (def MIN_JAVA_VERSION "16")
 (def RING_VERSION "1.13.0")
-(def CLJ_VERSION "1.8.0")
+(def CLJ_VERSION "1.11.0")
 
 (defproject com.github.igrishaev/ring-jdk-adapter "0.1.5-SNAPSHOT"
 

@@ -200,14 +200,17 @@
     (jdk/with-server [(handler-capture request!)
                       {:port PORT}]
       (let [{:keys [status]}
-            (client/get URL {:headers {:X-TEST ["foo" "bar" "baz"]}})
+            (client/get URL {:headers {:X-TEST ["foo" "bar" "baz"]
+                                       :CooKie ["a" "b" "c"]}})
 
             request
             @request!]
 
         (is (= 200 status))
         (is (= "foo,bar,baz"
-               (get-in request [:headers "x-test"])))))))
+               (get-in request [:headers "x-test"])))
+        (is (= "a;b;c"
+               (get-in request [:headers "cookie"])))))))
 
 
 (deftest test-server-header-multi-pass

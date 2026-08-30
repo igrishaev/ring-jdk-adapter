@@ -18,6 +18,7 @@ too (see benchmars below).
 - [Exception Handling](#exception-handling)
 - [HTTPs & SSL](#https--ssl)
 - [Benchmarks](#benchmarks)
+- [Other](#other)
 
 <!-- tocstop -->
 
@@ -243,4 +244,10 @@ Measured on Macbook M3 Pro 32Gb, default settings, the same REPL.
 
 <img src="media/chart_1.svg" width=75% height=auto>
 
-Ivan Grishaev, 2024
+## Other
+
+~~~
+©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©
+Ivan Grishaev, 2024. © UNLICENSE ©
+©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©©
+~~~

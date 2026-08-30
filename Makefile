@@ -1,4 +1,6 @@
 
+all: lint test
+
 repl:
 	lein with-profile +dev,+test repl
 
@@ -17,3 +19,6 @@ toc-build:
 
 install:
 	lein install
+
+lint:
+	clj-kondo --lint src test

@@ -16,7 +16,7 @@ public class Main {
                 return PersistentHashMap.create(
                         KW.status, 200,
                         KW.headers, PersistentHashMap.create("content-type", "text/plain"),
-                        KW.body, Clojure.var("clojure.core", "map").invoke(Clojure.var("clojure.core", "/"), PersistentVector.create(3, 2, 1, 0), PersistentVector.create(3, 2, 1, 0))
+                        KW.body, Clojure.var("clojure.core", "map").invoke(Clojure.var("clojure.core", "/"), PersistentVector.create(3, 2, 1, 0, 1), PersistentVector.create(3, 2, 1, 0, 1))
                 );
             }
         });

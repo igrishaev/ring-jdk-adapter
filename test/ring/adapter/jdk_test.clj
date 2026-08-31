@@ -167,7 +167,7 @@
         (is (str/includes? body "java.lang.RuntimeException: file not found: some-file.test"))))))
 
 
-(deftest test-server-return-iterable
+(deftest test-server-return-iseq
   (let [items (for [x ["aaa" "bbb" "ccc" 1 :foo {:test 3} nil [1 2 3]]]
                 x)]
     (jdk/with-server [(constantly
@@ -181,9 +181,11 @@
                (:body response)))))))
 
 
-(deftest test-server-return-iterable-exception
-  (let [items (for [x (range 1000)]
-                (throw (ex-info "aaa" {:x x})))]
+(deftest test-server-return-iseq-exception
+  (let [items (for [x (range 64)]
+                (if (= x 45)
+                  (throw (ex-info "boom" {:x x}))
+                  "x"))]
     (jdk/with-server [(constantly
                        {:status 200
                         :body items
@@ -191,8 +193,8 @@
                       {:port PORT}]
       (let [response (client/get URL)]
         (is (= 200 (:status response)))
-        (is (= 1
-               (:body response)))))))
+        (is (= 32
+               (-> response :body count)))))))
 
 
 (deftest test-server-header-multi-return

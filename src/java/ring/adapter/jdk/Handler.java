@@ -99,14 +99,17 @@ public class Handler implements HttpHandler {
         }
         sendStatus(exchange, response.status(), response.contentLength());
         try (final OutputStream out = exchange.getResponseBody()) {
-            final Iterable<?> bodyIter = response.bodyIter();
-            if (bodyIter != null) {
-                final
-                for (Object x: bodyIter) {
-                    if (x != null) {
-                        out.write(x.toString().getBytes(StandardCharsets.UTF_8));
+            ISeq bodySeq = response.bodySeq();
+            Object item;
+            if (bodySeq != null) {
+                do {
+                    item = bodySeq.first();
+                    if (item != null) {
+                        out.write(item.toString().getBytes(StandardCharsets.UTF_8));
                     }
+                    bodySeq = bodySeq.next();
                 }
+                while (bodySeq != null);
             } else {
                 try (final InputStream bodyStream = response.bodyStream()) {
                     bodyStream.transferTo(out);

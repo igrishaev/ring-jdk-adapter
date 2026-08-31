@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import clojure.lang.ISeq;
 import clojure.lang.Keyword;
 import clojure.lang.RT;
 
@@ -13,7 +14,7 @@ public record Response (
         int status,
         List<Header> headers,
         InputStream bodyStream,
-        Iterable<?> bodyIter,
+        ISeq bodySeq,
         long contentLength
 ) {
 
@@ -91,7 +92,7 @@ public record Response (
 
             final Object bodyObj = ringResponse.get(KW.body);
             final InputStream bodyStream;
-            Iterable<?> bodyIter = null;
+            ISeq bodySeq = null;
             long contentLength = 0;
 
             if (bodyObj instanceof InputStream in) {
@@ -108,14 +109,14 @@ public record Response (
                 contentLength = ba.length;
             } else if (bodyObj == null) {
                 bodyStream = InputStream.nullInputStream();
-            } else if (bodyObj instanceof Iterable<?> i) {
+            } else if (bodyObj instanceof ISeq iSeq) {
                 bodyStream = InputStream.nullInputStream();
-                bodyIter = i;
+                bodySeq = iSeq;
             } else {
                 throw Err.error("unsupported ring body: %s", bodyObj);
             }
 
-            return new Response(status, headers, bodyStream, bodyIter, contentLength);
+            return new Response(status, headers, bodyStream, bodySeq, contentLength);
 
         } else {
             throw Err.error("unsupported ring response: %s", x);
